@@ -1,5 +1,5 @@
 - id: '1663764235027'
-  alias: MinderGas Upload
+  alias: 'Heating: MinderGas Upload'
   description: ''
   trigger:
   - platform: time
@@ -12,7 +12,7 @@
     service: rest_command.mindergas_upload
   mode: single
 - id: '1663866130478'
-  alias: Washing Machine Ready Alert
+  alias: 'Appliance: Washing Machine Ready Alert'
   description: When washing machine operation state goes from running to finished
     decrease pods counter and send alert.
   trigger:
@@ -33,7 +33,7 @@
       title: Washing Machine Program Ready
   mode: restart
 - id: '1663866443446'
-  alias: Reload Home Connect Integration
+  alias: 'Appliance: Reload Home Connect Integration'
   description: ''
   trigger:
   - platform: state
@@ -48,7 +48,7 @@
       device_id: 19c0221a03e155e79180c45f1441ec39
   mode: single
 - id: '1664183831890'
-  alias: Start Pump When Heating Active
+  alias: 'Heating: Start Pump When Heating Active'
   description: ''
   trigger:
   - platform: state
@@ -65,7 +65,7 @@
     domain: switch
   mode: single
 - id: '1664183950138'
-  alias: Stop Pump When Heating System Standby
+  alias: 'Heating: Stop Pump When Heating System Standby'
   description: ''
   trigger:
   - platform: state
@@ -82,7 +82,7 @@
     domain: switch
   mode: single
 - id: '1667315255412'
-  alias: Ledstrip van Fenna Scene Selector
+  alias: 'Light: Ledstrip van Fenna Scene Selector'
   description: ''
   trigger:
   - platform: device
@@ -108,7 +108,7 @@
       entity_id: '{{ states(''input_select.scene_entities'')}}'
   mode: single
 - id: '1667315595138'
-  alias: Ledstrip van Fenna aan/uit button
+  alias: 'Light: Ledstrip van Fenna aan/uit button'
   description: ''
   trigger:
   - platform: device
@@ -240,4 +240,15 @@
       entity_id: input_number.sprinkler_maximum_temperature_measured
       value: '{{ states(''sensor.openweathermap_temperature'')|float }}'
     service: input_number.set_value
+  mode: single
+- id: '1668372487520'
+  alias: 'System: Upload Config Files to Github'
+  description: ''
+  trigger:
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - service: shell_command.push_updates_to_github
+    data: {}
   mode: single
