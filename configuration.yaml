@@ -54,3 +54,5 @@ google_assistant:
     light.ledstrip_van_rens:
       expose: true
       
+shell_command:
+  push-updates-to-github: bash /config/push-updates.sh
