@@ -55,4 +55,4 @@ google_assistant:
       expose: true
       
 shell_command:
-  push-updates-to-github: bash /config/push-updates.sh
+  push_updates_to_github: bash /config/push-updates.sh
