@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "serial": "Serial number",
+          "accesskey": "Access key",
+          "password": "[%key:common::config_flow::data::password%]"
+        }
+      },
+      "options": {
+        "data": {
+          "min_temp": "Minimum temperature",
+          "max_temp": "Maximum temperature",
+          "temp_step": "Temperature step"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "cannot_communicate": "Failed to communicate",
+      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
+      "invalid_credentials": "Invalid serial number / access key combination",
+      "invalid_password": "Invalid password"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}

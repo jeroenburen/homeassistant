@@ -1,0 +1,5 @@
+group:
+  name: Wekker Rens
+  entities:
+    - sensor.alarm_fade_in_time
+    - input_number.alarm_fade_in_time

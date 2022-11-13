@@ -1,0 +1,116 @@
+wasmachine_start_programma_40_graden:
+  sequence:
+  - type: turn_on
+    device_id: 19c0221a03e155e79180c45f1441ec39
+    entity_id: switch.wasmachine_program_auto40
+    domain: switch
+  mode: single
+  alias: Wasmachine Start Programma 40 Graden
+  icon: mdi:washing-machine
+light_fader:
+  alias: Light Fader
+  description: Fades lights to a desired level over a specified transition period.
+  fields:
+    light:
+      description: Entity_id of light(s) as a list or comma-separated.
+      example: light.kitchen, light.bathroom, light.garage
+    end_level_pct:
+      description: Integer value from 0 to 100 representing the desired final brightness
+        level.
+      example: '80'
+    transition:
+      description: Transition time for fading indicated in HH:MM:SS format (Hours:Minutes:Seconds).
+      example: 00:05:30
+    branch:
+      description: OPTIONAL. If unspecified, default is 'calculate'. 'execute_fade'
+        is reserved for use by the script itself.
+      example: calculate
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ branch is not defined or branch == ''calculate'' }}'
+      sequence:
+      - service: script.turn_on
+        entity_id: script.light_fader
+        data:
+          variables:
+            branch: execute_fade
+            light: '{{ light }}'
+            start_level_pct: '{% set b = state_attr(light, ''brightness'') %} {{ 0
+              if b == none else (b/255*100)|round }}'
+            end_level_pct: '{{ end_level_pct|int }}'
+            delay_milli_sec: '{% set b = state_attr(light, ''brightness'') %} {% set
+              start_level_pct = 0 if b == none else (b/255*100)|round %} {% set end_level_pct
+              = end_level_pct|int %} {% set t = transition.split('':'') | map(''int'')
+              | list %} {% set transition_secs = t[0]*3600 + t[1]*60 + t[2] %} {%
+              set delay_milli_sec = (((transition_secs/(end_level_pct - start_level_pct))|abs)|round(precision=3)*1000)|int
+              %} {{ 100 if delay_milli_sec <= 99 else delay_milli_sec }}'
+            step_pct: '{% set b = state_attr(light, ''brightness'') %} {% set start_level_pct
+              = 0 if b == none else (b/255*100)|round %} {{ 1 if start_level_pct <
+              end_level_pct|int else -1 }}'
+    - conditions:
+      - condition: template
+        value_template: '{{ branch is defined and branch == ''execute_fade'' }}'
+      sequence:
+      - repeat:
+          while:
+          - condition: template
+            value_template: '{{ repeat.index <= 102 }}'
+          - condition: template
+            value_template: "{% set b = state_attr(light, 'brightness') %} {% set
+              b = (b/255*100)|round if b != none else b %} {% if b == none -%}\n  {{
+              step_pct|int != -1 }}\n{%- elif b > end_level_pct|int -%}\n  {{ step_pct|int
+              == -1 }}\n{%- else -%}\n  {{ b < end_level_pct|int }}\n{%- endif %}"
+          - condition: template
+            value_template: '{% set b = state_attr(light, ''brightness'') %} {% set
+              b = (b/255*100)|round if b != none else 0 %} {{ b == start_level_pct|int
+              + ((repeat.index - 1) * (step_pct|int)) }}'
+          sequence:
+          - service: light.turn_on
+            data:
+              entity_id: '{{ light }} '
+              brightness_pct: '{% set x = start_level_pct|int + (repeat.index|int
+                * step_pct|int) %} {{ ([0, x, 100]|sort)[1] }}'
+          - delay:
+              milliseconds: '{{ delay_milli_sec|int }}'
+  mode: parallel
+reload_home_connect_integration:
+  alias: Reload Home Connect Integration
+  sequence:
+  - service: homeassistant.reload_config_entry
+    data: {}
+    target:
+      device_id: 19c0221a03e155e79180c45f1441ec39
+  mode: single
+  icon: mdi:reload
+sprinkler_reset_helper_values:
+  alias: 'Sprinkler: Reset Helper Values'
+  sequence:
+  - service: input_number.set_value
+    data:
+      value: 0
+    target:
+      entity_id:
+      - input_number.sprinkler_total_rain_fallen
+      - input_number.sprinkler_watering_duration
+  - data_template:
+      datetime: '{{ now() }}'
+      entity_id: input_datetime.sprinkler_last_watering_day
+    service: input_datetime.set_datetime
+  - service: input_number.set_value
+    data_template:
+      value: '{{ states(''sensor.openweathermap_temperature'') }}'
+    target:
+      entity_id: input_number.sprinkler_maximum_temperature_measured
+  mode: single
+  icon: mdi:restart
+sprinkler_water_the_garden:
+  alias: 'Sprinkler: Water the Garden'
+  sequence:
+  - service: notify.mobile_app_phone_iphone
+    data:
+      message: Start watering the garden for {{ states('input_number.sprinkler_watering_duration')
+        | int }} minutes
+  mode: single
+  icon: mdi:sprinkler

@@ -1,0 +1,41 @@
+sensor:
+  - name: "Sprinkler: Total Expected Precipitation"
+    unique_id: 1e858dc0-5dd5-11ed-9b6a-0242ac120002
+    icon: mdi:weather-pouring
+    unit_of_measurement: mm
+    state: >
+      {% set totalprecipitation = 0 | float %}
+      {% set ns = namespace() %}
+      {% set ns.totalprecipitation = 0 %}
+      {% for daypart in range(0, 4) %}
+        {% set precipitation = state_attr('weather.openweathermap', 'forecast')[daypart].precipitation %}
+        {% set precipitation_probability = state_attr('weather.openweathermap', 'forecast')[daypart].precipitation_probability / 100 %}
+        {% if precipitation_probability > 0 %}
+          {% set precipitation = precipitation * precipitation_probability %}
+        {% endif %}
+        {% set ns.totalprecipitation = ns.totalprecipitation + precipitation %}
+      {% endfor %}
+      {{ ns.totalprecipitation | float | round(1) }}
+
+  - name: "Sprinkler: Total Rain Fallen Plus Expected"
+    unique_id: 9673a46a-4b13-415b-afbd-04d41b84e93b
+    icon: mdi:weather-pouring
+    unit_of_measurement: mm
+    state: >
+      {{ (states('input_number.sprinkler_total_rain_fallen') | float + states('sensor.sprinkler_total_expected_precipitation') | float) | round(1) }}
+
+  - name: "Sprinkler: Days Since Last Watering Day"
+    unique_id: bcefe859-a1fd-486d-9cdf-f5478c45bbaa
+    icon: mdi:calendar
+    state: >
+      {{ ((as_timestamp(now()) - as_timestamp(states('input_datetime.sprinkler_last_watering_day'))) / 86400) | float | round(1) }}
+
+  - name: "Sprinkler: Current Temperature Is Higher"
+    unique_id: 0e206348-190f-4448-8ef5-5a247067ce13
+    icon: mdi:check
+    state: >
+      {% if states('sensor.openweathermap_temperature') > states('input.number.sprinkler_maximum_temperature_measured') %}
+        true
+      {% else %}
+        false
+      {% endif %}

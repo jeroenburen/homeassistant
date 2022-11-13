@@ -1,0 +1,56 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+my:
+  
+http:
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+  ip_ban_enabled: true
+  login_attempts_threshold: 3
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+sensor: !include sensors.yaml
+template: !include templates.yaml
+homeassistant:
+  customize: !include customize.yaml
+
+calendar:
+  - platform: caldav
+    url: https://caldav.icloud.com
+    username: !secret icloud_username
+    password: !secret icloud_password
+    calendars:
+      - Algemeen
+
+rest_command:
+  mindergas_upload:
+    url: 'https://www.mindergas.nl/api/meter_readings'
+    method: POST
+    headers:
+      content-type: application/json
+      AUTH-TOKEN: !secret mindergas_AUTH-TOKEN
+    payload: '{ "date": "{{date}}", "reading": "{{reading}}" }'
+
+
+google_assistant:
+  project_id: home-assistant-cf9bf
+  service_account: !include GOOGLE_SERVICE_ACCOUNT.json
+  report_state: true
+  expose_by_default: false
+  entity_config:
+    light.ledstrip_van_fenna:
+      expose: true  
+    light.ledstrip_van_rens:
+      expose: true
+      

@@ -1,0 +1,15 @@
+!*.yaml
+!*.gitignore
+!*.md
+!*.sh
+!*.js*
+
+GOOGLE_SERVICE_ACCOUNT.json
+secrets.yaml
+id_rsa*
+home-assistant.log*
+home-assistant_v2.db*
+
+.ssh
+.storage
+.cloud

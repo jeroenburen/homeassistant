@@ -1,0 +1,185 @@
+- id: '1667314075907'
+  name: Ledstrip van Fenna Rood
+  entities:
+    light.ledstrip_van_fenna:
+      min_mireds: 150
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: xy
+      hs_color:
+      - 0
+      - 100
+      rgb_color:
+      - 255
+      - 0
+      - 0
+      xy_color:
+      - 0.7006
+      - 0.2993
+      color:
+        x: 0.7006
+        y: 0.2993
+      linkquality: 255
+      icon: mdi:lightbulb
+      friendly_name: Ledstrip van Fenna
+      supported_features: 63
+      state: 'on'
+  icon: mdi:palette
+  metadata: {}
+- id: '1667314172597'
+  name: Ledstrip van Fenna Groen
+  entities:
+    light.ledstrip_van_fenna:
+      min_mireds: 150
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: xy
+      hs_color:
+      - 135.059
+      - 100
+      rgb_color:
+      - 0
+      - 255
+      - 64
+      xy_color:
+      - 0.17
+      - 0.703
+      color:
+        x: 0.17
+        y: 0.703
+      linkquality: 255
+      icon: mdi:lightbulb
+      friendly_name: Ledstrip van Fenna
+      supported_features: 63
+      state: 'on'
+  icon: mdi:palette
+  metadata: {}
+- id: '1667314238406'
+  name: Ledstrip van Fenna Blauw
+  entities:
+    light.ledstrip_van_fenna:
+      min_mireds: 150
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: xy
+      hs_color:
+      - 210.364
+      - 96.863
+      rgb_color:
+      - 8
+      - 130
+      - 255
+      xy_color:
+      - 0.141
+      - 0.137
+      color:
+        x: 0.141
+        y: 0.137
+      linkquality: 255
+      icon: mdi:lightbulb
+      friendly_name: Ledstrip van Fenna
+      supported_features: 63
+      state: 'on'
+  icon: mdi:palette
+  metadata: {}
+- id: '1667314310588'
+  name: Ledstrip van Fenna Wit
+  entities:
+    light.ledstrip_van_fenna:
+      min_mireds: 150
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: xy
+      hs_color:
+      - 0
+      - 0.392
+      rgb_color:
+      - 255
+      - 254
+      - 254
+      xy_color:
+      - 0.323
+      - 0.329
+      color:
+        x: 0.323
+        y: 0.329
+      linkquality: 255
+      icon: mdi:lightbulb
+      friendly_name: Ledstrip van Fenna
+      supported_features: 63
+      state: 'on'
+  icon: mdi:palette
+  metadata: {}
+- id: '1667314349177'
+  name: Ledstrip van Fenna Geel
+  entities:
+    light.ledstrip_van_fenna:
+      min_mireds: 150
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      - xy
+      color_mode: xy
+      hs_color:
+      - 60.235
+      - 100
+      rgb_color:
+      - 254
+      - 255
+      - 0
+      xy_color:
+      - 0.444
+      - 0.517
+      color:
+        x: 0.444
+        y: 0.517
+      linkquality: 255
+      icon: mdi:lightbulb
+      friendly_name: Ledstrip van Fenna
+      supported_features: 63
+      state: 'on'
+  icon: mdi:palette
+  metadata: {}

@@ -1,0 +1,33 @@
+- platform: time_date
+  display_options:
+    - 'time'
+    - 'date'
+    - 'date_time'
+    - 'date_time_utc'
+    - 'date_time_iso'
+    - 'time_date'
+    - 'time_utc'
+    - 'beat'
+
+- platform: rest
+  name: lenovo_tablet
+  json_attributes:
+    - batteryLevel
+    - kioskMode
+    - screenBrightness
+    - motionDetectorState
+    - maintenanceMode
+    - appFreeMemory
+    - appUsedMemory
+    - totalFreeMemory
+    - totalUsedMemory
+    - hostname4
+    - ip4
+    - mac
+    - locationLatitude
+    - locationLongitude
+    - locationAltitude
+    - startUrl
+    - currentPage
+  resource: http://192.168.2.27:2323/?cmd=deviceInfo&type=json&password=T@bl3t
+  value_template: '{{ value_json.isScreenOn }}'

@@ -1,0 +1,3 @@
+error 2022-11-12 13:46:41: MQTT error: Connection refused: Not authorized
+error 2022-11-12 13:46:41: MQTT failed to connect, exiting...
+error 2022-11-12 13:46:42: MQTT error: Connection refused: Not authorized

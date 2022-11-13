@@ -1,0 +1,243 @@
+- id: '1663764235027'
+  alias: MinderGas Upload
+  description: ''
+  trigger:
+  - platform: time
+    at: '23:58:00'
+  condition: []
+  action:
+  - data_template:
+      date: '{{ (as_timestamp(now())) | timestamp_custom("%Y-%m-%d", True)}}'
+      reading: '{{ states.sensor.p1_meter_total_gas.state }}'
+    service: rest_command.mindergas_upload
+  mode: single
+- id: '1663866130478'
+  alias: Washing Machine Ready Alert
+  description: When washing machine operation state goes from running to finished
+    decrease pods counter and send alert.
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.wasmachine_operation_state
+    from: Run
+    to: Finished
+  condition: []
+  action:
+  - service: counter.decrement
+    data: {}
+    target:
+      entity_id: counter.wasmiddel_pods
+  - service: notify.mobile_app_iphone_van_jeroen
+    data:
+      message: Home Assistant Alert
+      title: Washing Machine Program Ready
+  mode: restart
+- id: '1663866443446'
+  alias: Reload Home Connect Integration
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.wasmachine_remote_control
+    to: 'On'
+  condition: []
+  action:
+  - service: homeassistant.reload_config_entry
+    data: {}
+    target:
+      device_id: 19c0221a03e155e79180c45f1441ec39
+  mode: single
+- id: '1664183831890'
+  alias: Start Pump When Heating Active
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - climate.nefit
+    to: heating
+    attribute: hvac_action
+    from: idle
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 132a8fade85afc30a2d69e81653e3978
+    entity_id: switch.energysocket_pomp_switch
+    domain: switch
+  mode: single
+- id: '1664183950138'
+  alias: Stop Pump When Heating System Standby
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - climate.nefit
+    to: idle
+    attribute: hvac_action
+    from: heating
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 132a8fade85afc30a2d69e81653e3978
+    entity_id: switch.energysocket_pomp_switch
+    domain: switch
+  mode: single
+- id: '1667315255412'
+  alias: Ledstrip van Fenna Scene Selector
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 635b245959e4d983d687175d34b09307
+    type: action
+    subtype: arrow_left_click
+    discovery_id: 0x000d6ffffe57fcc9 action_arrow_left_click
+  - platform: device
+    domain: mqtt
+    device_id: 635b245959e4d983d687175d34b09307
+    type: action
+    subtype: arrow_right_click
+    discovery_id: 0x000d6ffffe57fcc9 action_arrow_right_click
+  condition: []
+  action:
+  - service: input_select.select_next
+    data: {}
+    target:
+      entity_id: input_select.scene_entities
+  - service: scene.turn_on
+    target:
+      entity_id: '{{ states(''input_select.scene_entities'')}}'
+  mode: single
+- id: '1667315595138'
+  alias: Ledstrip van Fenna aan/uit button
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 635b245959e4d983d687175d34b09307
+    type: action
+    subtype: toggle
+    discovery_id: 0x000d6ffffe57fcc9 action_toggle
+  condition: []
+  action:
+  - type: toggle
+    device_id: 1273dc70c7930aa2d5164532d16845e0
+    entity_id: light.ledstrip_van_fenna
+    domain: light
+  mode: single
+- id: '1667743093561'
+  alias: 'Sprinkler: Add Current Rain to Total Rain Fallen'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.openweathermap_rain
+  condition: []
+  action:
+  - data_template:
+      entity_id: input_number.sprinkler_total_rain_fallen
+      value: '{{ states(''input_number.sprinkler_total_rain_fallen'')|float + states(''sensor.openweathermap_rain'')|float
+        }}'
+    service: input_number.set_value
+  mode: single
+- id: '1667744626999'
+  alias: 'Sprinkler: Check if Garden Should Be Watered'
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+    offset: 0
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: input_number.sprinkler_maximum_temperature_measured
+        above: '31'
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
+        below: '20.1'
+      sequence:
+      - service: input_number.set_value
+        data:
+          value: 90
+        target:
+          entity_id: input_number.sprinkler_watering_duration
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_days_since_last_watering_day
+        above: '2'
+        below: '3'
+      - condition: numeric_state
+        entity_id: input_number.sprinkler_maximum_temperature_measured
+        above: '26'
+        below: '31.1'
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
+        below: '15.1'
+      sequence:
+      - service: input_number.set_value
+        data:
+          value: 75
+        target:
+          entity_id: input_number.sprinkler_watering_duration
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_days_since_last_watering_day
+        above: '3'
+        below: '4'
+      - condition: numeric_state
+        entity_id: input_number.sprinkler_maximum_temperature_measured
+        above: '21'
+        below: '26.1'
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
+        below: '10.1'
+      sequence:
+      - service: input_number.set_value
+        data:
+          value: 60
+        target:
+          entity_id: input_number.sprinkler_watering_duration
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_days_since_last_watering_day
+        above: '3'
+        below: '4'
+      - condition: numeric_state
+        entity_id: input_number.sprinkler_maximum_temperature_measured
+        above: '15'
+        below: '21.1'
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
+        below: '10.1'
+      sequence:
+      - service: input_number.set_value
+        data:
+          value: 45
+        target:
+          entity_id: input_number.sprinkler_watering_duration
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.sprinkler_days_since_last_watering_day
+        above: '3'
+        below: '4'
+      sequence: []
+    default: []
+  mode: single
+- id: '1667745881291'
+  alias: 'Sprinkler: Check Maximum Temperature when Temperature Changes'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.openweathermap_temperature
+  condition:
+  - condition: state
+    state: 'true'
+    entity_id: sensor.sprinkler_current_temperature_is_higher
+  action:
+  - data_template:
+      entity_id: input_number.sprinkler_maximum_temperature_measured
+      value: '{{ states(''sensor.openweathermap_temperature'')|float }}'
+    service: input_number.set_value
+  mode: single

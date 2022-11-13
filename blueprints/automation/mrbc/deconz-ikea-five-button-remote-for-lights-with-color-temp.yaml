@@ -1,0 +1,251 @@
+blueprint:
+  name: deCONZ - IKEA five button remote for lights with color temp
+  description: 'Control light entities with an IKEA five button remote (the round
+    ones).
+
+
+    The middle "on" button, toggles the lights on/off.
+
+    Dim up/down buttons will change the brightness smoothly and can be pressed and
+    held until the brightness is satisfactory.
+
+    Left/right buttons will change the color temperature smoothly and can be pressed
+    and held until the color temperature is satisfactory.
+
+    The min/max color temperature override values are fallback values for light entities
+    without min_mireds and max_mireds attributes (e.g. color lights with rgb_color
+    attribute).'
+  domain: automation
+  input:
+    remote:
+      name: Remote
+      description: IKEA remote to use
+      selector:
+        device:
+          integration: deconz
+          manufacturer: IKEA of Sweden
+          model: TRADFRI remote control
+    light:
+      name: Light(s)
+      description: The light entity (can be a group) to control
+      selector:
+        entity:
+          domain: light
+    force_brightness:
+      name: Force turn on brightness
+      description: Force the brightness to the set level below, when the "on" button
+        on the remote is pushed and lights turn on.
+      default: false
+      selector:
+        boolean: {}
+    brightness:
+      name: Brightness
+      description: Brightness of the light(s) when turning on
+      default: 50
+      selector:
+        number:
+          min: 0.0
+          max: 100.0
+          mode: slider
+          step: 1.0
+          unit_of_measurement: '%'
+    brightness_step_count:
+      name: Brightness Adjustment Steps
+      description: Steps/seconds needed to adjust brightness between 0% and 100%.
+      default: 6
+      selector:
+        number:
+          min: 1.0
+          max: 10.0
+          mode: slider
+          step: 1.0
+          unit_of_measurement: steps
+    color_temp_step_count:
+      name: Color Temperature Adjustment Steps
+      description: Steps/seconds needed to adjust color temperature between min and
+        max value.
+      default: 6
+      selector:
+        number:
+          min: 1.0
+          max: 10.0
+          mode: slider
+          step: 1.0
+          unit_of_measurement: steps
+    color_temp_min_override:
+      name: Min Color Temperature Override
+      description: Minimum color temperature value in mireds for light entities without
+        'min_mireds' attribute (e.g. color lights).
+      default: 151.0
+      selector:
+        number:
+          min: 151.0
+          max: 689.0
+          mode: slider
+          step: 1.0
+          unit_of_measurement: mireds
+    color_temp_max_override:
+      name: Max Color Temperature Override
+      description: Maximum color temperature value in mireds for light entities without
+        'max_mireds' attribute (e.g. color lights).
+      default: 689.0
+      selector:
+        number:
+          min: 151.0
+          max: 689.0
+          mode: slider
+          step: 1.0
+          unit_of_measurement: mireds
+  source_url: https://community.home-assistant.io/t/deconz-ikea-five-button-remote-for-lights-with-color-temp/257617
+mode: restart
+max_exceeded: silent
+variables:
+  light_entity: !input 'light'
+  force_brightness: !input 'force_brightness'
+  is_white_spectrum_light: '{{ (not state_attr(light_entity, "min_mireds") == none)|int
+    }}'
+  brightness_step_count: !input 'brightness_step_count'
+  color_temp_step_count: !input 'color_temp_step_count'
+  color_temp_min: !input 'color_temp_min_override'
+  color_temp_max: !input 'color_temp_max_override'
+  brightness_step: '{{ (255/brightness_step_count|int)|round(0, "ceil") }}'
+  color_temp_step: '{{ (((state_attr(light_entity, "max_mireds")|default(color_temp_max|int,
+    true) - state_attr(light_entity, "min_mireds")|default(color_temp_min|int, true))/color_temp_step_count|int)|abs)|round(0,
+    "ceil") }}'
+trigger:
+- platform: event
+  event_type: deconz_event
+  event_data:
+    device_id: !input 'remote'
+action:
+- variables:
+    event: '{{ trigger.event.data.event }}'
+- choose:
+  - conditions:
+    - '{{ event == 1002 }}'
+    sequence:
+    - choose:
+      - conditions: '{{ force_brightness }}'
+        sequence:
+        - service: light.toggle
+          entity_id: !input 'light'
+          data:
+            transition: 1
+            brightness_pct: !input 'brightness'
+      default:
+      - service: light.toggle
+        entity_id: !input 'light'
+  - conditions:
+    - '{{ event == 2002 }}'
+    sequence:
+    - service: light.turn_on
+      entity_id: !input 'light'
+      data:
+        brightness_step: '{{ brightness_step }}'
+        transition: 1
+  - conditions:
+    - '{{ event == 2001 }}'
+    sequence:
+    - repeat:
+        count: '{{ brightness_step_count }}'
+        sequence:
+        - service: light.turn_on
+          entity_id: !input 'light'
+          data:
+            brightness_step: '{{ brightness_step }}'
+            transition: 1
+        - delay: 1
+  - conditions:
+    - '{{ event == 3002 }}'
+    sequence:
+    - service: light.turn_on
+      entity_id: !input 'light'
+      data:
+        brightness_step: '{{ -([state_attr(light_entity, "brightness")-1, brightness_step]|min)
+          }}'
+        transition: 1
+  - conditions:
+    - '{{ event == 3001 }}'
+    sequence:
+    - repeat:
+        count: '{{ brightness_step_count }}'
+        sequence:
+        - service: light.turn_on
+          entity_id: !input 'light'
+          data:
+            brightness_step: '{{ -([state_attr(light_entity, "brightness")-1, brightness_step]|min)
+              }}'
+            transition: 1
+        - delay: 1
+  - conditions:
+    - condition: and
+      conditions:
+      - '{{ event == 4002 }}'
+      - '{{ is_state(light_entity, "on") }}'
+    sequence:
+    - service: light.turn_on
+      entity_id: !input 'light'
+      data:
+        color_temp: '{{ [(state_attr(light_entity, "color_temp")|default(1e6/([[[2.7182818284**(((state_attr(light_entity,
+          "rgb_color")|default([0,0,0], true))[1]+161.1195681661)/99.4708025861)*100,
+          6600]|min, 1000]|max, [[(2.7182818284**(((state_attr(light_entity, "rgb_color")|default([0,0,0],
+          true))[2]+305.0447927307)/138.5177312231)+10)*100, 6600]|min, 1900]|max]|sum/2),
+          True) + color_temp_step), color_temp_max|int*(1+10*is_white_spectrum_light)]|min
+          }}'
+        transition: 1
+  - conditions:
+    - condition: and
+      conditions:
+      - '{{ event == 4001 }}'
+      - '{{ is_state(light_entity, "on") }}'
+    sequence:
+    - repeat:
+        count: '{{ color_temp_step_count }}'
+        sequence:
+        - service: light.turn_on
+          entity_id: !input 'light'
+          data:
+            color_temp: '{{ [(state_attr(light_entity, "color_temp")|default(1e6/([[[2.7182818284**(((state_attr(light_entity,
+              "rgb_color")|default([0,0,0], true))[1]+161.1195681661)/99.4708025861)*100,
+              6600]|min, 1000]|max, [[(2.7182818284**(((state_attr(light_entity, "rgb_color")|default([0,0,0],
+              true))[2]+305.0447927307)/138.5177312231)+10)*100, 6600]|min, 1900]|max]|sum/2),
+              True) + color_temp_step), color_temp_max|int*(1+10*is_white_spectrum_light)]|min
+              }}'
+            transition: 1
+        - delay: 1
+  - conditions:
+    - condition: and
+      conditions:
+      - '{{ event == 5002 }}'
+      - '{{ is_state(light_entity, "on") }}'
+    sequence:
+    - service: light.turn_on
+      entity_id: !input 'light'
+      data:
+        color_temp: '{{ [(state_attr(light_entity, "color_temp")|default(1e6/([[[2.7182818284**(((state_attr(light_entity,
+          "rgb_color")|default([0,0,0], true))[1]+161.1195681661)/99.4708025861)*100,
+          6600]|min, 1000]|max, [[(2.7182818284**(((state_attr(light_entity, "rgb_color")|default([0,0,0],
+          true))[2]+305.0447927307)/138.5177312231)+10)*100, 6600]|min, 1900]|max]|sum/2),
+          True) - color_temp_step), color_temp_min|int*(1-is_white_spectrum_light)]|max
+          }}'
+        transition: 1
+  - conditions:
+    - condition: and
+      conditions:
+      - '{{ event == 5001 }}'
+      - '{{ is_state(light_entity, "on") }}'
+    sequence:
+    - repeat:
+        count: '{{ color_temp_step_count }}'
+        sequence:
+        - service: light.turn_on
+          entity_id: !input 'light'
+          data:
+            color_temp: '{{ [(state_attr(light_entity, "color_temp")|default(1e6/([[[2.7182818284**(((state_attr(light_entity,
+              "rgb_color")|default([0,0,0], true))[1]+161.1195681661)/99.4708025861)*100,
+              6600]|min, 1000]|max, [[(2.7182818284**(((state_attr(light_entity, "rgb_color")|default([0,0,0],
+              true))[2]+305.0447927307)/138.5177312231)+10)*100, 6600]|min, 1900]|max]|sum/2),
+              True) - color_temp_step), color_temp_min|int*(1-is_white_spectrum_light)]|max
+              }}'
+            transition: 1
+        - delay: 1

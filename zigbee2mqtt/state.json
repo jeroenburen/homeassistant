@@ -1,0 +1,28 @@
+{
+    "65289": {
+        "brightness": 254,
+        "state": "OFF",
+        "color_mode": "xy",
+        "color": {
+            "x": 0.7006,
+            "y": 0.2993
+        }
+    },
+    "0x588e81fffee2dac3": {
+        "state": "OFF",
+        "color_mode": "xy",
+        "color": {
+            "x": 0.7006,
+            "y": 0.2993
+        },
+        "color_temp": 160,
+        "linkquality": 255
+    },
+    "0x000d6ffffe57fcc9": {
+        "update": {
+            "state": "idle"
+        },
+        "update_available": false,
+        "linkquality": 255
+    }
+}

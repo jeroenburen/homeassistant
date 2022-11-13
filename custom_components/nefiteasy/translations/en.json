@@ -1,0 +1,32 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "cannot_communicate": "Failed to communicate",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error",
+            "invalid_credentials": "Invalid serial number / access key combination",
+            "invalid_password": "Invalid password"
+        },
+        "step": {
+            "options": {
+                "data": {
+                    "max_temp": "Maximum temperature",
+                    "min_temp": "Minimum temperature",
+                    "temp_step": "Temperature step"
+                }
+            },
+            "user": {
+                "data": {
+                    "accesskey": "Access key",
+                    "password": "Password",
+                    "serial": "Serial number"
+                }
+            }
+        }
+    },
+    "title": "Nefit Easy Bosch Thermostat"
+}
