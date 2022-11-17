@@ -151,77 +151,86 @@
   - choose:
     - conditions:
       - condition: numeric_state
+        entity_id: sensor.sprinkler_days_since_last_watering_day
+        below: '2'
+      - condition: numeric_state
         entity_id: input_number.sprinkler_maximum_temperature_measured
         above: '31'
-      - condition: numeric_state
-        entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
-        below: '20.1'
       sequence:
       - service: input_number.set_value
         data:
           value: 90
         target:
           entity_id: input_number.sprinkler_watering_duration
+      - service: script.sprinkler_water_the_garden
+        data: {}
     - conditions:
       - condition: numeric_state
         entity_id: sensor.sprinkler_days_since_last_watering_day
-        above: '2'
+        above: '1'
         below: '3'
       - condition: numeric_state
         entity_id: input_number.sprinkler_maximum_temperature_measured
         above: '26'
-        below: '31.1'
+        below: '31'
       - condition: numeric_state
         entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
-        below: '15.1'
+        below: '15'
       sequence:
       - service: input_number.set_value
         data:
           value: 75
         target:
           entity_id: input_number.sprinkler_watering_duration
+      - service: script.sprinkler_water_the_garden
+        data: {}
     - conditions:
       - condition: numeric_state
         entity_id: sensor.sprinkler_days_since_last_watering_day
-        above: '3'
+        above: '2'
         below: '4'
       - condition: numeric_state
         entity_id: input_number.sprinkler_maximum_temperature_measured
         above: '21'
-        below: '26.1'
+        below: '26'
       - condition: numeric_state
         entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
-        below: '10.1'
+        below: '10'
       sequence:
       - service: input_number.set_value
         data:
           value: 60
         target:
           entity_id: input_number.sprinkler_watering_duration
+      - service: script.sprinkler_water_the_garden
+        data: {}
     - conditions:
       - condition: numeric_state
         entity_id: sensor.sprinkler_days_since_last_watering_day
-        above: '3'
+        above: '2'
         below: '4'
       - condition: numeric_state
         entity_id: input_number.sprinkler_maximum_temperature_measured
         above: '15'
-        below: '21.1'
+        below: '21'
       - condition: numeric_state
         entity_id: sensor.sprinkler_total_rain_fallen_plus_expected
-        below: '10.1'
+        below: '10'
       sequence:
       - service: input_number.set_value
         data:
           value: 45
         target:
           entity_id: input_number.sprinkler_watering_duration
+      - service: script.sprinkler_water_the_garden
+        data: {}
     - conditions:
       - condition: numeric_state
         entity_id: sensor.sprinkler_days_since_last_watering_day
         above: '3'
-        below: '4'
-      sequence: []
+      sequence:
+      - service: script.sprinkler_reset_helper_values
+        data: {}
     default: []
   mode: single
 - id: '1667745881291'
