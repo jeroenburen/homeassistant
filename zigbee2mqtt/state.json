@@ -9,13 +9,13 @@
         }
     },
     "0x588e81fffee2dac3": {
-        "state": "ON",
+        "state": "OFF",
         "color_mode": "xy",
         "color": {
-            "x": 0.7006,
-            "y": 0.2993
+            "x": 0.17,
+            "y": 0.703
         },
-        "color_temp": 160,
+        "color_temp": 124,
         "linkquality": 255
     },
     "0x000d6ffffe57fcc9": {
