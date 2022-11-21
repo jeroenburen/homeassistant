@@ -7,7 +7,7 @@ sensor:
       {% set totalprecipitation = 0 | float %}
       {% set ns = namespace() %}
       {% set ns.totalprecipitation = 0 %}
-      {% for daypart in range(0, 4) %}
+      {% for daypart in range(1, 3) %}
         {% set precipitation = state_attr('weather.openweathermap', 'forecast')[daypart].precipitation %}
         {% set precipitation_probability = state_attr('weather.openweathermap', 'forecast')[daypart].precipitation_probability / 100 %}
         {% if precipitation_probability > 0 %}
