@@ -1,8 +1,7 @@
-
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 my:
-  
+
 http:
   ssl_certificate: /ssl/fullchain.pem
   ssl_key: /ssl/privkey.pem
@@ -24,6 +23,13 @@ sensor: !include sensors.yaml
 template: !include templates.yaml
 homeassistant:
   customize: !include customize.yaml
+  name: Home
+  latitude: 52.52203686061474
+  longitude: 4.9658487655552115
+  elevation: 3
+  unit_system: metric
+  currency: EUR
+  time_zone: "Europe/Amsterdam"
 
 calendar:
   - platform: caldav
@@ -35,13 +41,12 @@ calendar:
 
 rest_command:
   mindergas_upload:
-    url: 'https://www.mindergas.nl/api/meter_readings'
+    url: "https://www.mindergas.nl/api/meter_readings"
     method: POST
     headers:
       content-type: application/json
       AUTH-TOKEN: !secret mindergas_AUTH-TOKEN
     payload: '{ "date": "{{date}}", "reading": "{{reading}}" }'
-
 
 google_assistant:
   project_id: home-assistant-cf9bf
@@ -50,9 +55,14 @@ google_assistant:
   expose_by_default: false
   entity_config:
     light.ledstrip_van_fenna:
-      expose: true  
+      expose: true
     light.ledstrip_van_rens:
       expose: true
-      
+
 shell_command:
   push_updates_to_github: bash /config/push-updates.sh
+
+logger:
+  default: info
+  logs:
+    homeassistant.components.openweathermap: debug
