@@ -20,9 +20,11 @@
     },
     "0x000d6ffffe57fcc9": {
         "update": {
-            "state": "idle"
+            "state": "idle",
+            "installed_version": "2.3.080"
         },
         "update_available": false,
-        "linkquality": 255
+        "linkquality": 255,
+        "battery": 74
     }
 }
